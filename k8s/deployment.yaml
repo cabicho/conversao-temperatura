@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: web
+        image: cabicho/conversao-temperatura:v1  
+---
+# expondo a aplicacao
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  selector:
+    app: web
+  ports:
+  - port: 80
+    targetPort: 8080 # a porta que a aplicacao e expota no Dockerfile.EXPOSE
+    # como estamos usando o k3d vai-se usar a porta 30000
+    # kubectl apply -f k8s/deployment.yaml
+    # kubectl delete -f k8s/deployment.yaml
+    # k3d cluster create mycluster --servers 3 --agents 3 -p "30000:30000@loadbalancer"
+    nodePort: 30000
+  type: NodePort #LoadBalancer # LoadBalancer #NodePort
